@@ -1,0 +1,224 @@
+{
+  "_README": "사람용 설명은 sot-catalog.README.md 참조. 본 파일은 spec-verifier 스크립트가 직접 읽는 데이터 카탈로그다. 코멘트가 필요하면 README에 적는다.",
+  "version": 1,
+
+  "file_kinds": {
+    "design": {
+      "path": "design/design.md",
+      "optional": true,
+      "_note": "전략 설계 산출물(살아있는 단일 문서). 구조검증은 check_design.py(dev:design 2단계)가 하드 요구로 본다. 여기 optional=true는 spec 단계 run_all의 generic template 체크가 design 부재 시 실패하지 않도록 하기 위함이다. required_sections는 domain-architect의 7섹션과 정렬.",
+      "required_sections": [
+        "개요",
+        "도메인 카탈로그",
+        "컨텍스트 맵",
+        "핵심 흐름",
+        "설계 결정과 근거",
+        "결정 필요",
+        "버전"
+      ],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["domain_catalog", "context_map", "key_flow", "design_decision"]
+    },
+    "fragment": {
+      "path_glob": "changelog.d/*.md",
+      "required_sections": ["스프린트 목표", "갱신된 명세서"],
+      "required_metadata": ["forked-from", "스프린트 버전"],
+      "sot_for": ["sprint_change_log"]
+    },
+    "release_changelog": {
+      "path": "CHANGELOG.md",
+      "optional": true,
+      "required_sections": [],
+      "required_metadata": [],
+      "sot_for": ["release_version"]
+    },
+    "system": {
+      "path": "spec/system.md",
+      "required_sections": [
+        "서비스 구성",
+        "보안 정책",
+        "서비스 간 통신",
+        "외부 시스템",
+        "인프라 구성",
+        "배포 구조"
+      ],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["service_definition", "security_policy", "infra_definition", "deployment"]
+    },
+    "service": {
+      "path_glob": "spec/service/*.md",
+      "required_sections": ["공통 에러 처리"],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["common_error_handling", "app_chrome_screens"]
+    },
+    "domain_rules": {
+      "path_glob": "spec/domain/*/rules.md",
+      "excluded_subdirs": ["cross-domain"],
+      "required_sections": [
+        "용어 정의",
+        "비즈니스 규칙",
+        "역할별 권한",
+        "상태 전이",
+        "데이터 유효성 검증"
+      ],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["business_rule", "term_definition", "role_permission", "state_transition", "validation_rule"]
+    },
+    "domain_entities": {
+      "path_glob": "spec/domain/*/entities.md",
+      "excluded_subdirs": ["cross-domain"],
+      "required_sections": ["엔티티 관계 요약"],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["entity_definition", "entity_field", "entity_relationship", "seed_data_requirement"]
+    },
+    "domain_scenarios": {
+      "path_glob": "spec/domain/*/scenarios.md",
+      "excluded_subdirs": ["cross-domain"],
+      "required_sections": ["사용자 시나리오", "시스템 프로세스"],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["scenario", "edge_case", "error_case", "system_process"]
+    },
+    "domain_api": {
+      "path_glob": "spec/domain/*/api.md",
+      "excluded_subdirs": ["cross-domain"],
+      "required_sections": ["Endpoint 목록", "Endpoint 상세"],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["api_endpoint", "request_schema", "response_schema"]
+    },
+    "domain_screens": {
+      "path_glob": "spec/domain/*/screens.md",
+      "excluded_subdirs": ["cross-domain"],
+      "optional": true,
+      "required_sections": [],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["screen_layout", "screen_interaction", "form_validation"]
+    },
+    "cross_domain_flow": {
+      "path_glob": "spec/domain/cross-domain/*.md",
+      "excluded_files": ["screens.md"],
+      "required_sections": ["사용자 시나리오", "시스템 프로세스"],
+      "required_metadata": ["버전", "최종 수정", "관련 도메인"],
+      "sot_for": ["cross_domain_scenario", "cross_domain_process"]
+    },
+    "cross_domain_screens": {
+      "path": "spec/domain/cross-domain/screens.md",
+      "optional": true,
+      "required_sections": [],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["cross_domain_screen"]
+    },
+    "domain_ui": {
+      "path_glob": "spec/domain/*/ui.md",
+      "excluded_subdirs": ["cross-domain"],
+      "optional": true,
+      "_note": "화면별 시각 명세(ui-design-writer 산출). 프론트엔드 도메인에만 존재하므로 optional — glob 미매치 시 백엔드 도메인에 오탐 없음. screens.md(행위)와 같은 등급의 선택 파일이다.",
+      "required_sections": [],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["screen_visual", "component_selection", "visual_state"]
+    },
+    "cross_domain_ui": {
+      "path": "spec/domain/cross-domain/ui.md",
+      "optional": true,
+      "required_sections": [],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["cross_domain_screen_visual"]
+    }
+  },
+
+  "links": {
+    "internal_link_pattern": "\\[([^\\]]+)\\]\\(([^)]+)\\)",
+    "external_link_whitelist": []
+  },
+
+  "cross_refs": {
+    "_note": "추출 로직은 check_cross_refs.py의 함수에 있다. 카탈로그는 매핑 메타데이터만 정의한다. spec-gen 7단계 항목 (1)(2)(3)(5)(7)은 deterministic이 어렵거나 의미적이라 Stage 2 LLM judge 영역이다.",
+    "api_links_scenario": {
+      "description": "api.md가 참조한 시나리오 ID는 같은 도메인 scenarios.md에 정의되어야 한다",
+      "from": "domain_api",
+      "to": "domain_scenarios",
+      "scope": "same_domain",
+      "covers_seven_step_item": 6
+    },
+    "api_field_authority_entity": {
+      "description": "api.md가 'entities.md X.Y' 형태로 권위를 지정한 필드는 같은 도메인 entities.md에 실제 존재해야 한다",
+      "from": "domain_api",
+      "to": "domain_entities",
+      "scope": "same_domain",
+      "covers_seven_step_item": 8
+    },
+    "api_auth_role": {
+      "description": "api.md 표의 인증 컬럼이 명시한 역할은 같은 도메인 rules.md 역할별 권한에 정의되어야 한다",
+      "from": "domain_api",
+      "to": "domain_rules",
+      "scope": "same_domain",
+      "covers_seven_step_item": 9
+    },
+    "cross_domain_tag_exists": {
+      "description": "cross-domain 흐름의 [도메인] 태그는 spec/domain/{태그명}/ 디렉토리가 존재해야 한다",
+      "from": "cross_domain_flow",
+      "to": "domain_directory",
+      "scope": "global",
+      "covers_seven_step_item": 4
+    },
+    "fragment_lists_updated_files": {
+      "description": "fragment(changelog.d/*.md) '갱신된 명세서' 표에 적힌 spec 파일 경로는 실제로 존재해야 한다",
+      "from": "fragment",
+      "to": "spec_file",
+      "scope": "global"
+    },
+    "fragment_file_version_matches": {
+      "description": "fragment '갱신된 명세서' 표의 '파일 버전' 칸은 해당 spec 파일 상단 메타데이터의 '버전'과 일치해야 한다",
+      "from": "fragment",
+      "to": "spec_file_metadata",
+      "scope": "global"
+    },
+    "fragment_archive_exists": {
+      "description": "fragment '갱신된 명세서' 표 행마다 spec-archive/<스프린트 버전>/{spec/이하경로} 가 존재하고 그 파일 상단 '버전' 메타가 표의 '파일 버전'과 일치해야 한다. '변경' 칸이 '삭제'로 시작하는 행은 스냅샷 대상이 아니므로 스킵한다.",
+      "from": "fragment",
+      "to": "spec_archive_file",
+      "scope": "global",
+      "deletion_marker_prefix": "삭제"
+    },
+    "release_archive_exists": {
+      "description": "release(CHANGELOG.md)에 fold된 릴리스 엔트리(## v{X.Y.Z}) 버전마다 spec-archive/v{X.Y.Z}/ (또는 v 접두사 없는 {X.Y.Z}/) 디렉토리가 존재해야 한다. 릴리스 시점 검증 — 스프린트 시점엔 CHANGELOG.md가 없으므로 no-op. 헤더가 version_header_pattern과 매칭되는 엔트리만 대상으로 본다.",
+      "from": "release_changelog",
+      "to": "spec_archive_dir",
+      "scope": "global",
+      "version_header_pattern": "^##\\s+v?(\\d+\\.\\d+\\.\\d+)\\b"
+    }
+  },
+
+  "glossary": {
+    "path": "docs/glossary.md",
+    "forbidden_synonyms": []
+  },
+
+  "metadata_schemas": {
+    "default": {
+      "_note": "버전 값의 표기 형식(v 접두사 등)은 작성 가이드(컨벤션·writer 템플릿)가 강제하지 않으므로 검증도 형식을 강제하지 않는다. 존재 여부만 (1) 템플릿 체크가 본다. 메타 원칙: 검증↔작성 1:1 정렬 (sot-catalog.README.md).",
+      "fields": {
+        "최종 수정": { "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+      }
+    }
+  },
+
+  "type_consistency": {
+    "_note": "타입 문자열 alias 매칭은 폐지되었다. 작성 에이전트는 api.md 필드 타입을 자연어로 자유 표기하고 정합성은 `entities.md X.Y` 권위 매핑이 보장한다 (cross_refs.api_field_authority_entity가 검증). 메타 원칙: 검증↔작성 1:1 정렬. 기존 type_aliases 값은 backward-compat을 위해 빈 상태로 둔다.",
+    "type_aliases": {}
+  },
+
+  "coverage": {
+    "domain_required_files": ["rules.md", "entities.md", "scenarios.md", "api.md"],
+    "domain_optional_files": ["screens.md", "ui.md"]
+  },
+
+  "uniqueness": [
+    { "scope": "scenario_id",       "pattern": "\\bSC-\\d{3}\\b",     "in": "domain_scenarios" },
+    { "scope": "edge_case_id",      "pattern": "\\bSC-E\\d{2}\\b",    "in": "domain_scenarios" },
+    { "scope": "error_case_id",     "pattern": "\\bSC-R\\d{2}\\b",    "in": "domain_scenarios" },
+    { "scope": "system_process_id", "pattern": "\\bSP-\\d{3}\\b",     "in": "domain_scenarios" },
+    { "scope": "cross_scenario_id", "pattern": "\\bCD-SC-\\d{3}\\b",  "in": "cross_domain_flow" },
+    { "scope": "cross_process_id",  "pattern": "\\bCD-SP-\\d{3}\\b",  "in": "cross_domain_flow" },
+    { "scope": "api_id",            "pattern": "\\bAPI-\\d{3}\\b",    "in": "domain_api" }
+  ]
+}

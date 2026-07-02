@@ -1,0 +1,11 @@
+{
+  "name": "eqbr-plugins",
+  "owner": { "name": "EQBR", "email": "ojt1118@eqbr.com" },
+  "plugins": [
+    {
+      "name": "dev",
+      "source": "./plugins/dev",
+      "description": "개발 워크플로우 통합 (명세·구현·릴리스)"
+    }
+  ]
+}
