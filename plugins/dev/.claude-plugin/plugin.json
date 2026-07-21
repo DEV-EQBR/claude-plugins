@@ -1,0 +1,8 @@
+{
+  "name": "dev",
+  "description": "개발 워크플로우 통합 — 상세설계 작성(tactical)·구현(implement)·릴리스(release)를 한 플러그인에서 관리한다. impl-tactical/impl/release 통합본.",
+  "author": {
+    "name": "EQBR",
+    "email": "ojt1118@eqbr.com"
+  }
+}
