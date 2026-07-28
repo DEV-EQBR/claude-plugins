@@ -1,0 +1,385 @@
+{
+  "_README": "사람용 설명은 sot-catalog.README.md 참조. 본 파일은 tactical-verifier 스크립트가 직접 읽는 데이터 카탈로그다. 코멘트가 필요하면 README에 적는다.",
+  "version": 1,
+
+  "size_budget": {
+    "_note": "문서 크기 예산 (check_size_budget.py). 상한 초과는 '에이전트가 전량 읽을 수 없다' = 권위 문서 전제 붕괴를 뜻한다. 정상 처리는 임의 파일 분할이 아니라 도메인 분리 검토 bubble-up(⓪dev:design) — 파일을 쪼개면 file_kind 경로·필수 섹션 계약이 깨진다. advisory_bytes는 위반이 아니며 writer가 반환 보고에서 스스로 언급하는 자율 기준선이다. 이 키를 통째로 지우면 체크는 비활성(하위호환).",
+    "default_max_bytes": 200000,
+    "advisory_bytes": 60000,
+    "per_kind": {
+      "design": 250000
+    }
+  },
+
+  "history_residue": {
+    "_note": "이력 잔재 체크(check_history_residue.py). 라이브 문서=현재상태만(작성자 공통계약 current_state_only)을 결정론으로 집행. 이력 메타 필드(> 수정 이력:)·취소선(~~…~~)·델타 블록 서명을 잡는다. 취소선 처리는 종류별: 순수 대체는 최종 상태만 남기고, deprecated-but-present 필드·재사용 금지 결번 ID는 현재 제약이라 행·상태 보존하되 마크업만 벗겨 deprecated·결번 텍스트로 남긴다(정보는 상태 칸이 담음). 어느 경우든 ~~ 제거 = 취소선 0. 이력 권위는 CHANGELOG·tactical-archive. 이 키를 지우면 내장 기본값 사용(비활성 아님) — 완전 비활성은 run_all CHECKS에서 모듈 제거.",
+    "metadata_history_fields": ["수정 이력", "변경 이력"],
+    "delta_block_signatures": ["### 이전 델타", "적용 범위 전환", "스탠스 종료", "시스템 영향 점검", "델타 승계"],
+    "flag_strikethrough": true
+  },
+
+  "file_kinds": {
+    "design": {
+      "path": "design/design.md",
+      "optional": true,
+      "_note": "전략 설계 산출물(살아있는 단일 문서). 구조검증은 check_design.py(dev:design 2단계)가 하드 요구로 본다. 여기 optional=true는 spec 단계 run_all의 generic template 체크가 design 부재 시 실패하지 않도록 하기 위함이다. required_sections는 domain-architect의 8섹션과 정렬(완료 기준 = acceptance 앵커, 하류 검증 원장이 이걸 분해하므로 결정론 필수).",
+      "required_sections": [
+        "개요",
+        "도메인 카탈로그",
+        "컨텍스트 맵",
+        "핵심 흐름",
+        "설계 결정과 근거",
+        "결정 필요",
+        "완료 기준",
+        "버전"
+      ],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["domain_catalog", "context_map", "key_flow", "design_decision"]
+    },
+    "fragment": {
+      "path_glob": "changelog.d/*.md",
+      "required_sections": ["스프린트 목표", "갱신된 상세설계서"],
+      "required_metadata": ["forked-from", "스프린트 버전"],
+      "sot_for": ["sprint_change_log"]
+    },
+    "release_changelog": {
+      "path": "CHANGELOG.md",
+      "optional": true,
+      "required_sections": [],
+      "required_metadata": [],
+      "sot_for": ["release_version"]
+    },
+    "system": {
+      "path": "tactical/system.md",
+      "required_sections": [
+        "서비스 구성",
+        "보안 정책",
+        "서비스 간 통신",
+        "외부 시스템",
+        "인프라 구성",
+        "배포 구조"
+      ],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["service_definition", "security_policy", "infra_definition", "deployment"]
+    },
+    "service": {
+      "path_glob": "tactical/service/*.md",
+      "required_sections": ["공통 에러 처리"],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["common_error_handling", "app_chrome_screens"]
+    },
+    "domain_rules": {
+      "path_glob": "tactical/domain/*/rules.md",
+      "excluded_subdirs": ["cross-domain"],
+      "required_sections": [
+        "용어 정의",
+        "비즈니스 규칙",
+        "역할별 권한",
+        "상태 전이",
+        "데이터 유효성 검증"
+      ],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["business_rule", "term_definition", "role_permission", "state_transition", "validation_rule"]
+    },
+    "domain_entities": {
+      "path_glob": "tactical/domain/*/entities.md",
+      "excluded_subdirs": ["cross-domain"],
+      "required_sections": ["엔티티 관계 요약"],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["entity_definition", "entity_field", "entity_relationship", "seed_data_requirement"]
+    },
+    "domain_scenarios": {
+      "path_glob": "tactical/domain/*/scenarios.md",
+      "excluded_subdirs": ["cross-domain"],
+      "required_sections": ["사용자 시나리오", "시스템 프로세스"],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["scenario", "edge_case", "error_case", "system_process"]
+    },
+    "domain_api": {
+      "path_glob": "tactical/domain/*/api.md",
+      "excluded_subdirs": ["cross-domain"],
+      "required_sections": ["Endpoint 목록", "Endpoint 상세"],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["api_endpoint", "request_schema", "response_schema"]
+    },
+    "domain_screens": {
+      "path_glob": "tactical/domain/*/screens.md",
+      "excluded_subdirs": ["cross-domain"],
+      "optional": true,
+      "required_sections": [],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["screen_layout", "screen_interaction", "form_validation"]
+    },
+    "cross_domain_flow": {
+      "path_glob": "tactical/domain/cross-domain/*.md",
+      "excluded_files": ["screens.md"],
+      "required_sections": ["사용자 시나리오", "시스템 프로세스"],
+      "required_metadata": ["버전", "최종 수정", "관련 도메인"],
+      "sot_for": ["cross_domain_scenario", "cross_domain_process"]
+    },
+    "cross_domain_screens": {
+      "path": "tactical/domain/cross-domain/screens.md",
+      "optional": true,
+      "required_sections": [],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["cross_domain_screen"]
+    },
+    "domain_ui": {
+      "path_glob": "tactical/domain/*/ui.md",
+      "excluded_subdirs": ["cross-domain"],
+      "optional": true,
+      "_note": "화면별 시각 상세설계(ui-design-writer 산출). 프론트엔드 도메인에만 존재하므로 optional — glob 미매치 시 백엔드 도메인에 오탐 없음. screens.md(행위)와 같은 등급의 선택 파일이다.",
+      "required_sections": [],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["screen_visual", "component_selection", "visual_state"]
+    },
+    "cross_domain_ui": {
+      "path": "tactical/domain/cross-domain/ui.md",
+      "optional": true,
+      "required_sections": [],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["cross_domain_screen_visual"]
+    },
+    "requirements": {
+      "path": "design/requirements.md",
+      "optional": true,
+      "_note": "요구사항 추적 산출물(살아있는 단일 누적 문서, design.md 형제). domain-architect가 design/_input/ 원본을 소화해 각 요구사항에 R-n ID를 부여한다. optional=true → 부재 시 traceability·종결 게이트 전부 no-op(레거시·초기 스프린트 하위호환). 존재 = 팀 채택 = design.md 완료 기준에 AC·요구사항 칼럼 필수(check_traceability 채택 스위치). 살아있는 라이브 규율(현재 활성 + 미종결 승계만, 릴리스된 요구사항은 제거→tactical-archive 스냅샷)은 design.md·원장과 동일.",
+      "required_sections": ["요구사항 목록"],
+      "required_metadata": ["버전", "최종 수정"],
+      "sot_for": ["requirement"]
+    }
+  },
+
+  "links": {
+    "internal_link_pattern": "\\[([^\\]]+)\\]\\(([^)]+)\\)",
+    "external_link_whitelist": []
+  },
+
+  "cross_refs": {
+    "_note": "추출 로직은 check_cross_refs.py의 함수에 있다. 카탈로그는 매핑 메타데이터만 정의한다. spec-gen 7단계 항목 (1)(2)(3)(5)(7)은 deterministic이 어렵거나 의미적이라 Stage 2 LLM judge 영역이다.",
+    "api_links_scenario": {
+      "description": "api.md가 참조한 시나리오 ID는 같은 도메인 scenarios.md에 정의되어야 한다",
+      "from": "domain_api",
+      "to": "domain_scenarios",
+      "scope": "same_domain",
+      "covers_seven_step_item": 6
+    },
+    "api_field_authority_entity": {
+      "description": "api.md가 'entities.md X.Y' 형태로 권위를 지정한 필드는 같은 도메인 entities.md에 실제 존재해야 한다",
+      "from": "domain_api",
+      "to": "domain_entities",
+      "scope": "same_domain",
+      "covers_seven_step_item": 8
+    },
+    "api_auth_role": {
+      "description": "api.md 표의 인증 컬럼이 명시한 역할은 같은 도메인 rules.md 역할별 권한에 정의되어야 한다",
+      "from": "domain_api",
+      "to": "domain_rules",
+      "scope": "same_domain",
+      "covers_seven_step_item": 9
+    },
+    "cross_domain_tag_exists": {
+      "description": "cross-domain 흐름의 [도메인] 태그는 tactical/domain/{태그명}/ 디렉토리가 존재해야 한다",
+      "from": "cross_domain_flow",
+      "to": "domain_directory",
+      "scope": "global",
+      "covers_seven_step_item": 4
+    },
+    "fragment_lists_updated_files": {
+      "description": "fragment(changelog.d/*.md) '갱신된 상세설계서' 표에 적힌 spec 파일 경로는 실제로 존재해야 한다",
+      "from": "fragment",
+      "to": "tactical_file",
+      "scope": "global"
+    },
+    "fragment_file_version_matches": {
+      "description": "fragment '갱신된 상세설계서' 표의 '파일 버전' 칸은 해당 spec 파일 상단 메타데이터의 '버전'과 일치해야 한다",
+      "from": "fragment",
+      "to": "tactical_file_metadata",
+      "scope": "global"
+    },
+    "fragment_archive_exists": {
+      "description": "fragment '갱신된 상세설계서' 표 행마다 tactical-archive/<스프린트 버전>/{tactical/이하경로} 가 존재하고 그 파일 상단 '버전' 메타가 표의 '파일 버전'과 일치해야 한다. '변경' 칸이 '삭제'로 시작하는 행은 스냅샷 대상이 아니므로 스킵한다.",
+      "from": "fragment",
+      "to": "tactical_archive_file",
+      "scope": "global",
+      "deletion_marker_prefix": "삭제"
+    },
+    "release_archive_exists": {
+      "description": "release(CHANGELOG.md)에 fold된 릴리스 엔트리(## v{X.Y.Z}) 버전마다 tactical-archive/v{X.Y.Z}/ (또는 v 접두사 없는 {X.Y.Z}/) 디렉토리가 존재해야 한다. 릴리스 시점 검증 — 스프린트 시점엔 CHANGELOG.md가 없으므로 no-op. 헤더가 version_header_pattern과 매칭되는 엔트리만 대상으로 본다.",
+      "from": "release_changelog",
+      "to": "tactical_archive_dir",
+      "scope": "global",
+      "version_header_pattern": "^##\\s+v?(\\d+\\.\\d+\\.\\d+)\\b"
+    }
+  },
+
+  "verification_ledger": {
+    "_note": "검증 원장(tactical/verification-ledger.md) 백스톱 불변식 L1~L4. 추출·판정 로직은 check_ledger.py에 있고, 카탈로그는 매핑 메타데이터 + 라벨 SoT(면·컬럼·상태·채널·마커·경로)만 정의한다. 원장은 커밋된 살아있는 누적 아티팩트(tactical/과 동철학) — 릴리스 게이트로 dev:release가 fold/tag 전에 실행한다. 원장 부재(스프린트 초기) 시 no-op PASS. 원장은 전역 산출물이라 --domain 로컬 스코프에선 run_all이 skip(GLOBAL_ONLY). 검증↔작성 1:1 정렬(메타 원칙): 면·컬럼·상태·채널 라벨은 원장 writer 템플릿과 정확히 같아야 한다. v2 스키마 = 면별 다중 단정(T<n>) + 코더/verifier 2칸. 옛 5컬럼(면|검증 항목|채널|상태|해소 증거) 단일 상태 원장도 하위호환 파싱(옛 상태 칸을 verifier로 매핑).",
+    "ledger_path": "tactical/verification-ledger.md",
+    "archive_dir": "tactical-archive",
+    "tactical_dir": "tactical",
+    "facets": ["UI/UX", "로직", "데이터"],
+    "columns": ["면", "단정", "채널", "코더", "verifier", "해소 증거"],
+    "legacy_columns": ["면", "검증 항목", "채널", "상태", "해소 증거"],
+    "channels": ["1 정적구조", "2 로직단위", "3 계약API", "4 정적스크린샷", "5 실기기"],
+    "coder_statuses": ["PASS", "FAIL", "-", "N/A"],
+    "verifier_statuses": ["PASS", "FAIL", "보류", "미결", "-"],
+    "pass_status": "PASS",
+    "na_status": "N-A",
+    "coder_fail_status": "FAIL",
+    "carryforward_statuses": ["보류", "미결", "-"],
+    "contract_unresolved_marker": "계약 미결",
+    "empty_evidence_markers": ["", "-"],
+    "_note_closure": "종결 게이트(L5~L7) 라벨. run_all/check_ledger의 --boundary {implement|verify|release}에서만 발화한다(작성 시점 빈 칸 오탐 방지). 채널 매칭은 채널 칸 앞머리 숫자(예 '3 계약API'→'3')로 한다. channels_coder_owned=코더가 구현시점 테스트로 닫는 기기불필요 채널(1 정적구조·2 로직단위·3 계약API). 채널4(정적스크린샷)는 렌더가 필요해 verifier가 닫으므로 L5(코더 종결)에서 제외하고 L6(verifier 종결)가 강제한다. carryforward_meta_field=AC블록 상단 `> ... | 승계: <값> | ...`의 값이 carryforward_new_value(신규)가 아니면 직전 스프린트 이월 블록 → L5/L6 PASS 강제 면제(부채는 L4 승계·L7 승인으로 관리). N-A 면은 종결 면제.",
+    "channels_coder_owned": ["1", "2", "3"],
+    "channel_device": "5",
+    "coder_nonclosure_statuses": ["-", "보류"],
+    "verifier_nonclosure_statuses": ["-", "미결", "FAIL"],
+    "hold_status": "보류",
+    "hold_approval_pattern": "승인:\\s*\\S+",
+    "carryforward_meta_field": "승계",
+    "carryforward_new_value": "신규",
+    "checks": {
+      "verification_ledger_facets_complete": {
+        "description": "각 AC블록(## AC-<n>)에 UI/UX·로직·데이터 3면이 전부(각 면 ≥1행) 존재해야 한다(L1 완비). 면이 N-A인 행은 단정 칸에 `N-A` 뒤 사유 텍스트가 있어야 한다.",
+        "level": "L1",
+        "from": "verification_ledger",
+        "to": "self",
+        "scope": "global"
+      },
+      "verification_ledger_pass_evidence": {
+        "description": "코더 또는 verifier 칸이 PASS인 행은 해소 증거 칸이 비어 있지 않아야 한다(L2 PASS 무결성). 빈칸/`-`이면 위반 — 미달성·미검증이 증거 없이 done으로 승격되는 걸 차단한다.",
+        "level": "L2",
+        "from": "verification_ledger",
+        "to": "self",
+        "scope": "global"
+      },
+      "contract_unresolved_zero": {
+        "description": "원장 및 tactical/ 트리 어디에도 `계약 미결` 마커가 남아 있으면 안 된다(L3). 경계 계약 타입은 확정 또는 escalate하되 암묵 방치 금지.",
+        "level": "L3",
+        "from": "verification_ledger",
+        "to": "tactical_tree",
+        "scope": "global"
+      },
+      "verification_ledger_carryforward": {
+        "description": "직전 버전 archive 원장(tactical-archive/<직전 semver>/verification-ledger.md)에서 미종결이던 단정(verifier ∈ {보류, 미결, -} 또는 코더 = FAIL)이 현재 원장에 여전히 존재해야 한다(L4 누적 승계, drop 0). 단정 단위(T<n>)로 판정하며 옛 스키마(T id 없음)는 (AC-<n>, 면) 단위로 폴백. 직전 버전은 tactical-archive/ 의 순수 semver 디렉토리 최신값(v 접두사 무관).",
+        "level": "L4",
+        "from": "tactical_archive_ledger",
+        "to": "verification_ledger",
+        "scope": "global"
+      },
+      "verification_ledger_coder_closure": {
+        "description": "구현 out-gate(--boundary implement 이상). 코더가 책임지는 채널(1~4)이고 N-A가 아닌 단정의 코더 칸이 미착수('-')·보류로 남아 있으면 위반(L5 코더 종결). 채널5(실기기)는 코더 면제, 직전 스프린트 승계 블록(승계≠신규)은 면제. 미구현·미착수 항목이 구현 경계를 조용히 통과하는 걸 차단한다. PASS 행 증거는 L2가 본다.",
+        "level": "L5",
+        "gate": "implement",
+        "from": "verification_ledger",
+        "to": "self",
+        "scope": "global"
+      },
+      "verification_ledger_verifier_closure": {
+        "description": "검증 out-gate(--boundary verify 이상). N-A가 아닌 단정의 verifier 칸이 PASS(+증거)이거나 승인된 채널5 보류가 아니면 위반(L6 verifier 종결). '-'·미결·FAIL·무토큰 보류가 하나라도 남으면 release 차단. 직전 스프린트 승계 블록(승계≠신규)은 PASS 강제 면제(부채는 L4·L7).",
+        "level": "L6",
+        "gate": "verify",
+        "from": "verification_ledger",
+        "to": "self",
+        "scope": "global"
+      },
+      "verification_ledger_hold_approved_debt": {
+        "description": "검증·릴리스 게이트(--boundary verify|release). verifier=보류인 단정은 (채널5 실기기) ∧ (사유 텍스트 존재) ∧ (해소 증거 칸에 항목별 승인 토큰 hold_approval_pattern 매칭) 셋을 전부 만족해야 통과(L7 승인된 부채). 포괄 사전승인이 개별 단정 토큰을 못 채우면 여전히 차단 — '컴파일된다만 검증하고 보류=코드결함아님'으로 통째 면제되는 통로를 막는다.",
+        "level": "L7",
+        "gate": "verify",
+        "from": "verification_ledger",
+        "to": "self",
+        "scope": "global"
+      }
+    }
+  },
+
+  "traceability": {
+    "_note": "경계 커버리지 결정론 검사(check_traceability.py, GLOBAL_ONLY). requirements→완료기준→원장 AC의 ID 조인으로 '상류 전항목이 하류에 대응됐는가'를 강제한다. requirements.md 부재 시 전체 no-op(하위호환). 존재하면 채택으로 보고 design.md 완료 기준 표에 AC·요구사항 칼럼을 요구한다(채택 스위치). 라이브 규율(활성+승계만)이라 릴리스된 요구사항은 라이브 집합에 없어 change-scoped 스프린트 오탐 0. R-n itemization·완료기준이 요구사항을 진짜 담는가는 ⓪ 사람 게이트(의미), 여기선 ID 존재·집합 대응만 본다.",
+    "requirements_path": "design/requirements.md",
+    "design_path": "design/design.md",
+    "ledger_path": "tactical/verification-ledger.md",
+    "requirement_id_pattern": "\\bR-\\d+\\b",
+    "ac_id_pattern": "\\bAC-\\d+\\b",
+    "requirement_status_field": "상태",
+    "requirement_active_statuses": ["active", "승계"],
+    "acceptance_section": "완료 기준",
+    "acceptance_ac_columns": ["AC"],
+    "acceptance_req_columns": ["요구사항"],
+    "ledger_carryforward_meta_field": "승계",
+    "ledger_carryforward_new_value": "신규",
+    "checks": {
+      "traceability_requirement_covered": {
+        "description": "COV-1: requirements.md의 상태 ∈ {active,승계}인 모든 R-n이 design.md 완료 기준 표의 요구사항 칸에서 ≥1회 참조돼야 한다(상류 전항목→하류 대응). 미참조 R-n = 완료 기준 없는 요구사항 = 위반.",
+        "level": "COV1",
+        "from": "requirements",
+        "to": "design",
+        "scope": "global"
+      },
+      "traceability_acceptance_req_exists": {
+        "description": "COV-1b(dangling): design.md 완료 기준 표가 참조한 R-n이 requirements.md에 실제 존재해야 한다.",
+        "level": "COV1b",
+        "from": "design",
+        "to": "requirements",
+        "scope": "global"
+      },
+      "traceability_acceptance_covered_by_ac": {
+        "description": "COV-2: design.md 완료 기준 표의 모든 AC-n이 원장에 `## AC-n` 블록으로 존재해야 한다(완료 기준→검증 항목 대응). 원장 부재 시 no-op(상세설계 전).",
+        "level": "COV2",
+        "from": "design",
+        "to": "verification_ledger",
+        "scope": "global"
+      },
+      "traceability_ac_traces_to_acceptance": {
+        "description": "COV-2b(dangling): 원장의 모든 `## AC-n` 블록이 design.md 완료 기준에 존재해야 한다(원장이 완료 기준 없는 AC를 발명 금지). 직전 스프린트 승계 블록(승계≠신규)은 타이밍 스큐 방지 위해 면제.",
+        "level": "COV2b",
+        "from": "verification_ledger",
+        "to": "design",
+        "scope": "global"
+      }
+    }
+  },
+
+  "dev_diagnostic_log": {
+    "_note": "개발 진단 로그 선언 검사(check_dev_log.py). local-verification 컨벤션(conventions/system/local-verification.md)의 '개발 진단 로그' 결정 항목이 system.md '검증 환경 컨벤션'에 선언됐는지 결정론으로 확인한다. 트리거 self-consistent: 검증 환경 컨벤션 섹션은 그 컨벤션이 적용될 때(서비스 존재)만 생기므로, 있으면 진단 로그 선언을 요구한다. system.md 부재 또는 검증 환경 컨벤션 섹션 부재 → no-op PASS(하위호환). 결정론은 '선언 존재'만 본다 — 실제 로그 코드 계측은 coder 상시 의무·verifier 소비(의미)로 강제(모션 프로브와 동형, 코드 계측은 결정론으로 못 잡음). 전역 산출물이라 --domain에서 skip(GLOBAL_ONLY).",
+    "system_path": "tactical/system.md",
+    "convention_section_prefix": "검증 환경 컨벤션",
+    "declaration_label": "개발 진단 로그"
+  },
+
+  "glossary": {
+    "path": "docs/glossary.md",
+    "forbidden_synonyms": []
+  },
+
+  "metadata_schemas": {
+    "default": {
+      "_note": "버전 값의 표기 형식(v 접두사 등)은 작성 가이드(컨벤션·writer 템플릿)가 강제하지 않으므로 검증도 형식을 강제하지 않는다. 존재 여부만 (1) 템플릿 체크가 본다. 메타 원칙: 검증↔작성 1:1 정렬 (sot-catalog.README.md).",
+      "fields": {
+        "최종 수정": { "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+      }
+    }
+  },
+
+  "type_consistency": {
+    "_note": "타입 문자열 alias 매칭은 폐지되었다. 작성 에이전트는 api.md 필드 타입을 자연어로 자유 표기하고 정합성은 `entities.md X.Y` 권위 매핑이 보장한다 (cross_refs.api_field_authority_entity가 검증). 메타 원칙: 검증↔작성 1:1 정렬. 기존 type_aliases 값은 backward-compat을 위해 빈 상태로 둔다.",
+    "type_aliases": {}
+  },
+
+  "coverage": {
+    "domain_required_files": ["rules.md", "entities.md", "scenarios.md", "api.md"],
+    "domain_optional_files": ["screens.md", "ui.md"]
+  },
+
+  "uniqueness": [
+    { "scope": "requirement_id",    "pattern": "\\bR-\\d+\\b",        "in": "requirements" },
+    { "scope": "scenario_id",       "pattern": "\\bSC-\\d{3}\\b",     "in": "domain_scenarios" },
+    { "scope": "edge_case_id",      "pattern": "\\bSC-E\\d{2}\\b",    "in": "domain_scenarios" },
+    { "scope": "error_case_id",     "pattern": "\\bSC-R\\d{2}\\b",    "in": "domain_scenarios" },
+    { "scope": "system_process_id", "pattern": "\\bSP-\\d{3}\\b",     "in": "domain_scenarios" },
+    { "scope": "cross_scenario_id", "pattern": "\\bCD-SC-\\d{3}\\b",  "in": "cross_domain_flow" },
+    { "scope": "cross_process_id",  "pattern": "\\bCD-SP-\\d{3}\\b",  "in": "cross_domain_flow" },
+    { "scope": "api_id",            "pattern": "\\bAPI-\\d{3}\\b",    "in": "domain_api" }
+  ]
+}

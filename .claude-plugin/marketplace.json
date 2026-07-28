@@ -1,0 +1,16 @@
+{
+  "name": "eqbr-plugins",
+  "owner": { "name": "EQBR", "email": "ojt1118@eqbr.com" },
+  "plugins": [
+    {
+      "name": "dev",
+      "source": "./plugins/dev",
+      "description": "개발 워크플로우 통합 (명세·구현·릴리스)"
+    },
+    {
+      "name": "atdd",
+      "source": "./plugins/atdd",
+      "description": "자동 인수 테스트 (요구 정돈·인수 기준·인수 테스트 프로그램)"
+    }
+  ]
+}
